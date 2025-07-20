@@ -161,7 +161,12 @@ useEffect(() => {
         <Button
           onClick={handleSubmit(handleSave)}
           variant="contained"
-          sx={{ borderRadius: 2, backgroundColor: "#facc15" }}
+          sx={{
+            borderRadius: 2,
+            backgroundColor: "#facc15",
+            color: "#000",
+            '&:hover': { backgroundColor: "#eab308" }
+          }}
         >
           Save
         </Button>

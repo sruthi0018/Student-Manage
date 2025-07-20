@@ -31,7 +31,7 @@ const HomePage = () => {
               title="Manage Students"
               description="Create, view, edit or delete student records"
               route="/students"
-              icon="school"
+
             />
           </Grid>
         )}
@@ -40,9 +40,8 @@ const HomePage = () => {
           <Grid item xs={12} sm={6} md={4}>
             <DashboardCard
               title="Manage Staff"
-              description="Add, modify, or delete staff accounts"
+              description="Create, view, edit or delete staff accounts"
               route="/staff"
-              icon="group"
             />
           </Grid>
         )}

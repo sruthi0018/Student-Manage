@@ -28,6 +28,7 @@ import {
 } from "../../redux/slices/staff";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import PermissionsDialog from "../components/PermissionDialog";
+import AlertSnackbar from "../components/AlertSnackbar";
 
 const StaffPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -39,6 +40,16 @@ const StaffPage = () => {
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
 
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const showAlert = (message, severity = "success") => {
+    setAlert({ open: true, message, severity });
+  };
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -48,7 +59,7 @@ const StaffPage = () => {
   const { staffs, staff } = useSelector((state) => state.staffs);
 
   const handleAddClick = () => {
-    setEditingStaff(null); // Reset form
+    setEditingStaff(null); 
     setOpenDialog(true);
   };
 
@@ -79,6 +90,7 @@ const StaffPage = () => {
   const handleConfirmDelete = async () => {
     if (staffToDelete) {
       await dispatch(DeleteStaff(staffToDelete));
+      showAlert('Staff deleted successfully', 'success');
       dispatch(GetAllStaffs());
       setDeleteDialogOpen(false);
       setStaffToDelete(null);
@@ -90,14 +102,17 @@ const StaffPage = () => {
       if (staff) {
         const id = staff?._id;
         await dispatch(updateStaff(id, staffData));
+        showAlert('Staff updated successfully', 'success');
       } else {
         await dispatch(CreateStaff(staffData));
+        showAlert('Staff created and credentials sent via email successfully', 'success');
       }
       dispatch(GetAllStaffs());
 
       setEditingStaff(null);
       setOpenDialog(false);
     } catch (error) {
+      showAlert('Failed', 'error');
       console.error("Save failed:", error.message);
     }
   };
@@ -109,8 +124,10 @@ const StaffPage = () => {
           updateStaffPermissions(staff._id, { permissions: updatedPermissions })
         );
         dispatch(GetAllStaffs());
+        showAlert('Staff Permissions updated successfully', 'success');
         setPermissionsDialogOpen(false);
       } catch (error) {
+        showAlert('Failed to update', 'error');
         console.error("Failed to update permissions:", error);
       }
     }
@@ -151,7 +168,7 @@ const StaffPage = () => {
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.email}</TableCell>
                 {/* <TableCell>{item.role}</TableCell> */}
-               
+
                 <TableCell align="right">
                   <IconButton
                     onClick={(e) => {
@@ -220,6 +237,12 @@ const StaffPage = () => {
         onClose={() => setPermissionsDialogOpen(false)}
         onSave={handleUpdatePermissions}
         permissions={staff?.permissions}
+      />
+      <AlertSnackbar
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        message={alert.message}
+        severity={alert.severity}
       />
     </Box>
   );

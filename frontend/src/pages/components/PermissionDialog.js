@@ -11,8 +11,12 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
+
 
 const PermissionsDialog = ({ open, onClose, onSave, permissions }) => {
+      const theme = useTheme();
+    
   const [studentPermissions, setStudentPermissions] = useState({
     view: false,
     create: false,
@@ -38,10 +42,14 @@ const PermissionsDialog = ({ open, onClose, onSave, permissions }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose}  maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: { borderRadius: 3, padding: theme.spacing(1) }
+      }}>
       <DialogTitle>
         <Typography variant="h6" fontWeight="bold" sx={{ color: "#1e3a8a" }}>
-          Update Student Permissions
+          Update Access Permissions for Student Management
         </Typography>
       </DialogTitle>
       <DialogContent>
@@ -63,11 +71,16 @@ const PermissionsDialog = ({ open, onClose, onSave, permissions }) => {
         </Grid>
       </DialogContent>
       <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose} variant="outlined" color="secondary" sx={{ borderRadius: 2 }}>Cancel</Button>
         <Button
           variant="contained"
           onClick={handleSave}
-          sx={{ borderRadius: 2, backgroundColor: "#facc15" }}
+          sx={{
+            borderRadius: 2,
+            backgroundColor: "#facc15",
+            color: "#000",
+            '&:hover': { backgroundColor: "#eab308" }
+          }}
         >
           Save
         </Button>

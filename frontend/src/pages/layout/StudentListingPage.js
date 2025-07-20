@@ -28,6 +28,7 @@ import {
 } from "../../redux/slices/student";
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmationDialog from "../components/ConfirmationDialog";
+import AlertSnackbar from "../components/AlertSnackbar";
 
 const StudentPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -46,6 +47,17 @@ const StudentPage = () => {
   const { students, student } = useSelector((state) => state.students);
 
   console.log(students, "students");
+
+  const [alert, setAlert] = useState({
+  open: false,
+  message: '',
+  severity: 'success'
+});
+
+const showAlert = (message, severity = 'success') => {
+  setAlert({ open: true, message, severity });
+};
+
 
   const handleDeleteClick = (studentId) => {
     setStudentToDelete(studentId);
@@ -67,14 +79,17 @@ const StudentPage = () => {
       if (student) {
         const id = student?._id;
         await dispatch(UpdateStudent(id, data));
+        showAlert('Student updated successfully', 'success');
       } else {
         await dispatch(CreateStudent(data));
+        showAlert('Student created successfully', 'success');
       }
       dispatch(GetAllStudents());
 
       setEditStudent(null);
       setOpenDialog(false);
     } catch (error) {
+      showAlert('Failed to delete student', 'error');
       console.error("Save failed:", error.message);
     }
   };
@@ -82,6 +97,7 @@ const StudentPage = () => {
   const confirmDelete = async () => {
     if (studentToDelete) {
       await dispatch(DeleteStudent(studentToDelete));
+      showAlert('Student deleted successfully', 'success');
       setDeleteDialogOpen(false);
       setStudentToDelete(null);
     }
@@ -193,6 +209,13 @@ const StudentPage = () => {
         title="Delete Student"
         message="Are you sure you want to delete this student?"
       />
+      <AlertSnackbar
+  open={alert.open}
+  onClose={() => setAlert({ ...alert, open: false })}
+  message={alert.message}
+  severity={alert.severity}
+/>
+
     </Box>
   );
 };
