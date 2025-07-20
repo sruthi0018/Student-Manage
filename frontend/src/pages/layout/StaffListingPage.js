@@ -14,9 +14,14 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import NewStaffDialog from "../components/NewStaffDialog";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useDispatch, useSelector } from "react-redux";
 import {
   CreateStaff,
@@ -29,6 +34,7 @@ import {
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import PermissionsDialog from "../components/PermissionDialog";
 import AlertSnackbar from "../components/AlertSnackbar";
+import EmptyTableContent from "../components/EmptyContent";
 
 const StaffPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -56,10 +62,10 @@ const StaffPage = () => {
     dispatch(GetAllStaffs());
   }, [dispatch]);
 
-  const { staffs, staff } = useSelector((state) => state.staffs);
+  const { staffs, staff, isLoading } = useSelector((state) => state.staffs);
 
   const handleAddClick = () => {
-    setEditingStaff(null); 
+    setEditingStaff(null);
     setOpenDialog(true);
   };
 
@@ -90,7 +96,7 @@ const StaffPage = () => {
   const handleConfirmDelete = async () => {
     if (staffToDelete) {
       await dispatch(DeleteStaff(staffToDelete));
-      showAlert('Staff deleted successfully', 'success');
+      showAlert("Staff deleted successfully", "success");
       dispatch(GetAllStaffs());
       setDeleteDialogOpen(false);
       setStaffToDelete(null);
@@ -102,17 +108,20 @@ const StaffPage = () => {
       if (staff) {
         const id = staff?._id;
         await dispatch(updateStaff(id, staffData));
-        showAlert('Staff updated successfully', 'success');
+        showAlert("Staff updated successfully", "success");
       } else {
         await dispatch(CreateStaff(staffData));
-        showAlert('Staff created and credentials sent via email successfully', 'success');
+        showAlert(
+          "Staff created and credentials sent via email successfully",
+          "success"
+        );
       }
       dispatch(GetAllStaffs());
 
       setEditingStaff(null);
       setOpenDialog(false);
     } catch (error) {
-      showAlert('Failed', 'error');
+      showAlert("Failed", "error");
       console.error("Save failed:", error.message);
     }
   };
@@ -124,10 +133,10 @@ const StaffPage = () => {
           updateStaffPermissions(staff._id, { permissions: updatedPermissions })
         );
         dispatch(GetAllStaffs());
-        showAlert('Staff Permissions updated successfully', 'success');
+        showAlert("Staff Permissions updated successfully", "success");
         setPermissionsDialogOpen(false);
       } catch (error) {
-        showAlert('Failed to update', 'error');
+        showAlert("Failed to update", "error");
         console.error("Failed to update permissions:", error);
       }
     }
@@ -193,7 +202,10 @@ const StaffPage = () => {
                         setMenuAnchor(null);
                       }}
                     >
-                      Edit
+                      <ListItemIcon>
+                        <EditIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText>Edit</ListItemText>
                     </MenuItem>
                     <MenuItem
                       onClick={(e) => {
@@ -202,7 +214,10 @@ const StaffPage = () => {
                         setMenuAnchor(null);
                       }}
                     >
-                      Delete
+                      <ListItemIcon>
+                        <DeleteIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText>Delete</ListItemText>
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
@@ -210,12 +225,21 @@ const StaffPage = () => {
                         setMenuAnchor(null);
                       }}
                     >
-                      Update Permissions
+                      <ListItemIcon>
+                        <LockOpenIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText>Update Permissions</ListItemText>{" "}
                     </MenuItem>
                   </Menu>
                 </TableCell>
               </TableRow>
             ))}
+            <EmptyTableContent
+              isLoading={isLoading}
+              dataLength={staffs.length}
+              colSpan={6}
+              emptyMessage="No staff records found"
+            />
           </TableBody>
         </Table>
       </TableContainer>

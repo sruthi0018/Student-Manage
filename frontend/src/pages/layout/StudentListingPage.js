@@ -14,8 +14,12 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import NewStudentDialog from "../components/NewStudentDialog";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -29,6 +33,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import AlertSnackbar from "../components/AlertSnackbar";
+import EmptyTableContent from "../components/EmptyContent";
 
 const StudentPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -44,20 +49,21 @@ const StudentPage = () => {
   useEffect(() => {
     dispatch(GetAllStudents());
   }, [dispatch]);
-  const { students, student } = useSelector((state) => state.students);
+  const { students, student, isLoading } = useSelector(
+    (state) => state.students
+  );
 
   console.log(students, "students");
 
   const [alert, setAlert] = useState({
-  open: false,
-  message: '',
-  severity: 'success'
-});
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
-const showAlert = (message, severity = 'success') => {
-  setAlert({ open: true, message, severity });
-};
-
+  const showAlert = (message, severity = "success") => {
+    setAlert({ open: true, message, severity });
+  };
 
   const handleDeleteClick = (studentId) => {
     setStudentToDelete(studentId);
@@ -79,17 +85,17 @@ const showAlert = (message, severity = 'success') => {
       if (student) {
         const id = student?._id;
         await dispatch(UpdateStudent(id, data));
-        showAlert('Student updated successfully', 'success');
+        showAlert("Student updated successfully", "success");
       } else {
         await dispatch(CreateStudent(data));
-        showAlert('Student created successfully', 'success');
+        showAlert("Student created successfully", "success");
       }
       dispatch(GetAllStudents());
 
       setEditStudent(null);
       setOpenDialog(false);
     } catch (error) {
-      showAlert('Failed to delete student', 'error');
+      showAlert("Failed to delete student", "error");
       console.error("Save failed:", error.message);
     }
   };
@@ -97,7 +103,7 @@ const showAlert = (message, severity = 'success') => {
   const confirmDelete = async () => {
     if (studentToDelete) {
       await dispatch(DeleteStudent(studentToDelete));
-      showAlert('Student deleted successfully', 'success');
+      showAlert("Student deleted successfully", "success");
       setDeleteDialogOpen(false);
       setStudentToDelete(null);
     }
@@ -175,7 +181,10 @@ const showAlert = (message, severity = 'success') => {
                             setMenuAnchor(null);
                           }}
                         >
-                          Edit
+                          <ListItemIcon>
+                            <EditIcon fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText>Edit</ListItemText>
                         </MenuItem>
                       )}
                       {user?.permissions?.student?.delete && (
@@ -185,7 +194,10 @@ const showAlert = (message, severity = 'success') => {
                             setMenuAnchor(null);
                           }}
                         >
-                          Delete
+                          <ListItemIcon>
+                            <DeleteIcon fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText>Delete</ListItemText>
                         </MenuItem>
                       )}
                     </Menu>
@@ -193,6 +205,12 @@ const showAlert = (message, severity = 'success') => {
                 )}
               </TableRow>
             ))}
+            <EmptyTableContent
+              isLoading={isLoading}
+              dataLength={students.length}
+              colSpan={6}
+              emptyMessage="No students records found"
+            />
           </TableBody>
         </Table>
       </TableContainer>
@@ -210,12 +228,11 @@ const showAlert = (message, severity = 'success') => {
         message="Are you sure you want to delete this student?"
       />
       <AlertSnackbar
-  open={alert.open}
-  onClose={() => setAlert({ ...alert, open: false })}
-  message={alert.message}
-  severity={alert.severity}
-/>
-
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        message={alert.message}
+        severity={alert.severity}
+      />
     </Box>
   );
 };

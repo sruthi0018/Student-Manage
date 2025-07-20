@@ -9,7 +9,10 @@ import {
   MenuItem,
   Button,
   Box,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -66,7 +69,10 @@ const Header = () => {
               anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
               transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              <MenuItem onClick={handleLogout}> <ListItemIcon>
+        <LogoutIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText>Logout</ListItemText></MenuItem>
             </Menu>
           </>
         ) : (

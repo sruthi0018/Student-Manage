@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const DashboardCard = ({ title, description, route,}) => {
+const DashboardCard = ({ title, description, route,icon}) => {
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -29,6 +29,7 @@ const DashboardCard = ({ title, description, route,}) => {
       <CardActionArea onClick={() => navigate(route)} sx={{ height: '100%' }}>
         <CardContent>
           <Box display="flex" alignItems="center" gap={2} mb={1}>
+            
             <Typography variant="h6" sx={{ color: '#1e3a8a', fontWeight: 600 }}>
               {title}
             </Typography>
