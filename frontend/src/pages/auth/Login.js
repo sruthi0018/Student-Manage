@@ -8,7 +8,8 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { LoadingButton } from "@mui/lab";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -34,9 +35,9 @@ export default function Login() {
   };
 
   const {
-    register,
     handleSubmit,
-    formState: { errors },
+    control,
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -87,29 +88,42 @@ export default function Login() {
               noValidate
               sx={{ mt: 2 }}
             >
-              <TextField
-                fullWidth
-                label="Email"
-                {...register("email")}
-                margin="normal"
-                error={!!errors.email}
-                helperText={errors.email?.message}
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    margin="normal"
+                    {...field}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
+                )}
               />
 
-              <TextField
-                fullWidth
-                label="Password"
-                type="password"
-                {...register("password")}
-                margin="normal"
-                error={!!errors.password}
-                helperText={errors.password?.message}
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type="password"
+                    margin="normal"
+                    {...field}
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                  />
+                )}
               />
 
-              <Button
+              <LoadingButton
                 fullWidth
                 type="submit"
                 variant="contained"
+                loading={isSubmitting}
                 sx={{
                   mt: 3,
                   py: 1.5,
@@ -117,10 +131,13 @@ export default function Login() {
                   color: "#000",
                   fontWeight: "bold",
                   borderRadius: "50px",
+                  "&:hover": {
+                    backgroundColor: "#fbbf24",
+                  },
                 }}
               >
                 LOGIN
-              </Button>
+              </LoadingButton>
 
               <Button
                 fullWidth
@@ -133,6 +150,7 @@ export default function Login() {
             </Box>
           </Paper>
         </Container>
+
         <AlertSnackbar
           open={alert.open}
           onClose={() => setAlert({ ...alert, open: false })}

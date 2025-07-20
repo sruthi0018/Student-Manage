@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
-  Button,
   Container,
   Grid,
   TextField,
   Typography,
   Paper,
+  Button,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { LoadingButton } from "@mui/lab";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -35,22 +36,23 @@ export default function Register() {
   };
 
   const {
-    register,
     handleSubmit,
-    formState: { errors },
+    control,
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
+      name: "",
+      email: "",
+      password: "",
       role: "superadmin",
     },
     resolver: yupResolver(schema),
   });
 
   const onSubmit = async (formData) => {
-    console.log(formData, "formdata");
     const res = await signup(formData);
     if (res.success) {
       showAlert("Signup successful", "success");
-
       navigate("/login");
     } else {
       showAlert(res.message, "error");
@@ -93,32 +95,50 @@ export default function Register() {
               noValidate
               sx={{ mt: 2 }}
             >
-              <TextField
-                fullWidth
-                label="Name"
-                {...register("name")}
-                margin="normal"
-                error={!!errors.name}
-                helperText={errors.name?.message}
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    label="Name"
+                    margin="normal"
+                    {...field}
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                  />
+                )}
               />
 
-              <TextField
-                fullWidth
-                label="Email"
-                {...register("email")}
-                margin="normal"
-                error={!!errors.email}
-                helperText={errors.email?.message}
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    margin="normal"
+                    {...field}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
+                )}
               />
 
-              <TextField
-                fullWidth
-                label="Password"
-                type="password"
-                {...register("password")}
-                margin="normal"
-                error={!!errors.password}
-                helperText={errors.password?.message}
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type="password"
+                    margin="normal"
+                    {...field}
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                  />
+                )}
               />
 
               <TextField
@@ -129,10 +149,11 @@ export default function Register() {
                 InputProps={{ readOnly: true }}
               />
 
-              <Button
+              <LoadingButton
                 fullWidth
                 type="submit"
                 variant="contained"
+                loading={isSubmitting}
                 sx={{
                   mt: 3,
                   py: 1.5,
@@ -140,10 +161,13 @@ export default function Register() {
                   color: "#000",
                   fontWeight: "bold",
                   borderRadius: "50px",
+                  "&:hover": {
+                    backgroundColor: "#fbbf24",
+                  },
                 }}
               >
                 SIGN UP
-              </Button>
+              </LoadingButton>
 
               <Button
                 fullWidth
@@ -156,6 +180,7 @@ export default function Register() {
             </Box>
           </Paper>
         </Container>
+
         <AlertSnackbar
           open={alert.open}
           onClose={() => setAlert({ ...alert, open: false })}
