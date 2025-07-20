@@ -13,7 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-
+import AlertSnackbar from "../components/AlertSnackbar";
 
 const schema = Yup.object().shape({
   name: Yup.string().required("Name is required").min(2),
@@ -23,8 +23,16 @@ const schema = Yup.object().shape({
 
 export default function Register() {
   const navigate = useNavigate();
-  const {signup} = useAuth()
-  // const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const { signup } = useAuth();
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const showAlert = (message, severity = "success") => {
+    setAlert({ open: true, message, severity });
+  };
 
   const {
     register,
@@ -37,26 +45,28 @@ export default function Register() {
     resolver: yupResolver(schema),
   });
 
-  // useEffect(() => {
-  //   const handleResize = () => setIsMobile(window.innerWidth < 768);
-  //   window.addEventListener("resize", handleResize);
-  //   return () => window.removeEventListener("resize", handleResize);
-  // }, []);
-
   const onSubmit = async (formData) => {
     console.log(formData, "formdata");
     const res = await signup(formData);
     if (res.success) {
-      alert("Signup successful");
+      showAlert("Signup successful", "success");
+
       navigate("/login");
     } else {
-      alert(res.message);
+      showAlert(res.message, "error");
     }
   };
 
   return (
-    <Grid container sx={{ minHeight: "100vh", backgroundColor: "#1e3a8a" ,justifyContent: "center",
-     alignItems: "center",}} >
+    <Grid
+      container
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "#1e3a8a",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <Grid
         item
         xs={12}
@@ -111,7 +121,6 @@ export default function Register() {
                 helperText={errors.password?.message}
               />
 
-              
               <TextField
                 fullWidth
                 label="User Role"
@@ -147,6 +156,12 @@ export default function Register() {
             </Box>
           </Paper>
         </Container>
+        <AlertSnackbar
+          open={alert.open}
+          onClose={() => setAlert({ ...alert, open: false })}
+          message={alert.message}
+          severity={alert.severity}
+        />
       </Grid>
     </Grid>
   );

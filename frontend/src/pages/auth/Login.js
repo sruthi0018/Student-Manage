@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Grid,
   Container,
@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
-
+import AlertSnackbar from "../components/AlertSnackbar";
 
 const schema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -22,7 +22,16 @@ const schema = Yup.object().shape({
 
 export default function Login() {
   const navigate = useNavigate();
-  const {login} = useAuth()
+  const { login } = useAuth();
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const showAlert = (message, severity = "success") => {
+    setAlert({ open: true, message, severity });
+  };
 
   const {
     register,
@@ -32,19 +41,26 @@ export default function Login() {
     resolver: yupResolver(schema),
   });
 
-const onSubmit = async (formData) => {
-  const res = await login(formData);
-  if (res.success) {
-    navigate('/'); 
-    alert('SignIn successful');
-  } else {
-    alert(res.message);
-  }
-};
+  const onSubmit = async (formData) => {
+    const res = await login(formData);
+    if (res.success) {
+      showAlert("Login successfully", "success");
+      navigate("/");
+    } else {
+      showAlert(res.message, "error");
+    }
+  };
 
   return (
-    <Grid container sx={{ minHeight: "100vh", backgroundColor: "#1e3a8a" ,justifyContent: "center",
-     alignItems: "center",}}>
+    <Grid
+      container
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "#1e3a8a",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <Grid
         item
         xs={12}
@@ -117,6 +133,12 @@ const onSubmit = async (formData) => {
             </Box>
           </Paper>
         </Container>
+        <AlertSnackbar
+          open={alert.open}
+          onClose={() => setAlert({ ...alert, open: false })}
+          message={alert.message}
+          severity={alert.severity}
+        />
       </Grid>
     </Grid>
   );
