@@ -35,7 +35,7 @@ export default function Login() {
 const onSubmit = async (formData) => {
   const res = await login(formData);
   if (res.success) {
-    navigate('/home'); 
+    navigate('/'); 
     alert('SignIn successful');
   } else {
     alert(res.message);

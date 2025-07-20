@@ -1,46 +1,45 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes,Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import HomePage from './pages/layout/Home';
 import StudentPage from './pages/layout/StudentListingPage';
-import Header from './pages/components/Header';
-import SideNav from './pages/components/SideBar';
-import { Box, Toolbar } from '@mui/material';
 import StaffPage from './pages/layout/StaffListingPage';
+import Layout from './pages/layout/Layout';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Unauthorized from './pages/layout/Unauthorized';
 
+const AppRoutes = () => {
+  const { user } = useAuth();
 
-// function App() {
-//   return (
-//     <AuthProvider>
-//     <Router>
-//       <Routes>
-//         <Route path="/" element={<Register/>} />
-//         <Route path="/login" element={<Login/>} />
-//         <Route path="/home" element={<HomePage/>} />
-//         <Route path="/students" element={<StudentPage/>} />
+  return (
+    <Routes>
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
 
-//       </Routes>
-//     </Router>
-//     </AuthProvider>
-//   );
-// }
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage />} />
 
-// export default App;
+        <Route
+          path="/students"
+          element={
+            user?.role === 'superadmin' || user?.permissions?.student?.view
+              ? <StudentPage />
+              : <Unauthorized />
+          }
+        />
+
+        <Route path="/staff" element={<StaffPage />} />
+      </Route>
+    </Routes>
+  );
+};
 
 const App = () => (
   <Router>
-    <Header />
-    <SideNav />
-    <Box component="main" sx={{ ml: 26, p: 3 }}>
-      <Toolbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/students" element={<StudentPage />} />
-        <Route path="/staff" element={<StaffPage />} />
-      </Routes>
-    </Box>
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   </Router>
 );
 

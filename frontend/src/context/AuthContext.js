@@ -1,9 +1,11 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 
 
 const AuthContext = createContext();
+
+
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() =>
@@ -14,13 +16,13 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
   }, [token]);
 
   const login = async (formData) => {
     try {
-      const res = await axios.post(`${process.env.REACT_APP_BASE_URL}/api/auth/login`, formData);
+      const res = await axiosInstance.post(`${process.env.REACT_APP_BASE_URL}/api/auth/login`, formData);
       const { token, user } = res.data;
       setUser(user);
       setToken(token);
@@ -34,7 +36,10 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (formData) => {
     try {
-      const res = await axios.post(`${process.env.REACT_APP_BASE_URL}/api/auth/register`, formData);
+      const res = await axiosInstance
+      
+      
+      .post(`${process.env.REACT_APP_BASE_URL}/api/auth/register`, formData);
       return { success: true, message: res.data.message };
     } catch (err) {
       return { success: false, message: err.response?.data?.message || 'Register failed' };
@@ -46,7 +51,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
+    delete axiosInstance.defaults.headers.common['Authorization'];
   };
 
   return (

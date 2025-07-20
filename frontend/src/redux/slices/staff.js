@@ -4,12 +4,12 @@ import axiosInstance from "../../utils/axios";
 const initialState = {
   isLoading: false,
   error: null,
-  student: null,
-  students: [],
+  staff: null,
+  staffs: [],
 };
 
 const slice = createSlice({
-  name: "students",
+  name: "staffs",
   initialState,
   reducers: {
     startLoading(state) {
@@ -19,52 +19,52 @@ const slice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     },
-    createstudentSuccess(state, action) {
+    createStaffSuccess(state, action) {
       state.isLoading = false;
-      state.students.push(action.payload);
+      state.staffs.push(action.payload);
     },
-    getStudentsSuccess(state, action) {
+    getStaffsSuccess(state, action) {
       state.isLoading = false;
-      state.students = action.payload;
+      state.staffs = action.payload;
     },
 
-    getStudentSuccess(state, action) {
+    getStaffSuccess(state, action) {
       state.isLoading = false;
-      state.student = action.payload;
+      state.staff = action.payload;
     },
-    updateStudentSuccess(state, action) {
+    updateStaffSuccess(state, action) {
       state.isLoading = false;
       const updated = action.payload;
-      const index = state.students.findIndex((p) => p._id === updated._id);
+      const index = state.staffs.findIndex((p) => p._id === updated._id);
       if (index !== -1) {
-        state.students[index] = updated;
+        state.staffs[index] = updated;
       }
     },
-    deleteStudentSuccess(state, action) {
+    deleteStaffSuccess(state, action) {
       state.isLoading = false;
-      state.students = state.students.filter(
-        (student) => student._id !== action.payload
+      state.staffs = state.staffs.filter(
+        (staff) => staff._id !== action.payload
       );
     },
-    clearSingleStudent(state) {
-      state.student = null;
+    clearSingleStaff(state) {
+      state.staff = null;
     },
   },
 });
 
 export default slice.reducer;
-export const { clearSingleStudent } = slice.actions;
+export const { clearSingleStaff } = slice.actions;
 
-export function CreateStudent(data) {
+export function CreateStaff(data) {
   return async (dispatch) => {
     dispatch(slice.actions.startLoading());
     try {
       const response = await axiosInstance.post(
-        `${process.env.REACT_APP_BASE_URL}/api/students`,
+        `${process.env.REACT_APP_BASE_URL}/api/staff`,
         data
       );
       console.log("crpro", response.data);
-      dispatch(slice.actions.createstudentSuccess(response.data));
+      dispatch(slice.actions.createStaffSuccess(response.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
       throw error;
@@ -72,44 +72,44 @@ export function CreateStudent(data) {
   };
 }
 
-export const GetAllStudents = () => async (dispatch) => {
+export const GetAllStaffs = () => async (dispatch) => {
   dispatch(slice.actions.startLoading());
   try {
     const response = await axiosInstance.get(
-      `${process.env.REACT_APP_BASE_URL}/api/students`
+      `${process.env.REACT_APP_BASE_URL}/api/staff`
     );
-    console.log("gtp", response.data);
-    dispatch(slice.actions.getStudentsSuccess(response.data));
+    console.log("gtp", response);
+    dispatch(slice.actions.getStaffsSuccess(response.data));
   } catch (error) {
     dispatch(slice.actions.hasError(error.message));
   }
 };
 
-export function GetStudentById(id) {
+export function GetStaffById(id) {
   console.log("iddd", id);
   return async (dispatch) => {
     dispatch(slice.actions.startLoading());
     try {
       const response = await axiosInstance.get(
-        `${process.env.REACT_APP_BASE_URL}/api/students/${id}`
+        `${process.env.REACT_APP_BASE_URL}/api/staff/${id}`
       );
       console.log("getprod", response);
-      dispatch(slice.actions.getStudentSuccess(response.data));
+      dispatch(slice.actions.getStaffSuccess(response.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
     }
   };
 }
 
-export function UpdateStudent(id, data) {
+export function updateStaff(id, data) {
   return async (dispatch) => {
     dispatch(slice.actions.startLoading());
     try {
       const response = await axiosInstance.put(
-        `${process.env.REACT_APP_BASE_URL}/api/students/${id}`,
+        `${process.env.REACT_APP_BASE_URL}/api/staff/${id}`,
         data
       );
-      dispatch(slice.actions.updateStudentSuccess(response.data));
+      dispatch(slice.actions.updateStaffSuccess(response.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
       throw error;
@@ -117,14 +117,29 @@ export function UpdateStudent(id, data) {
   };
 }
 
-export function DeleteStudent(id) {
+export function updateStaffPermissions(id, permissions) {
+  return async (dispatch) => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const response = await axiosInstance.put(
+        `${process.env.REACT_APP_BASE_URL}/api/staff/${id}/permissions`,
+        permissions
+      );
+      dispatch(slice.actions.updateStaffSuccess(response.data));
+    } catch (error) {
+      dispatch(slice.actions.hasError(error.message));
+    }
+  };
+}
+
+export function DeleteStaff(id) {
   return async (dispatch) => {
     dispatch(slice.actions.startLoading());
     try {
       await axiosInstance.delete(
-        `${process.env.REACT_APP_BASE_URL}/api/students/${id}`
+        `${process.env.REACT_APP_BASE_URL}/api/staff/${id}`
       );
-      dispatch(slice.actions.deleteStudentSuccess(id));
+      dispatch(slice.actions.deleteStaffSuccess(id));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
     }
