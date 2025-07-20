@@ -65,6 +65,13 @@ const StudentPage = () => {
     setAlert({ open: true, message, severity });
   };
 
+  const handleAddClick = () => {
+    dispatch(clearSingleStudent());
+    setSelectedStudentId(null);
+    setEditStudent(null);
+    setOpenDialog(true);
+  };
+
   const handleDeleteClick = (studentId) => {
     setStudentToDelete(studentId);
     setDeleteDialogOpen(true);
@@ -72,8 +79,7 @@ const StudentPage = () => {
 
   const handleEdit = async (studentId) => {
     try {
-      const response = await dispatch(GetStudentById(studentId));
-      setEditStudent(response);
+      setSelectedStudentId(studentId);
       setOpenDialog(true);
     } catch (error) {
       console.error("Failed to load student details:", error);
@@ -112,6 +118,7 @@ const StudentPage = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setEditStudent(null);
+    setSelectedStudentId(null);
     dispatch(clearSingleStudent());
   };
 
@@ -129,7 +136,7 @@ const StudentPage = () => {
           <Button
             variant="contained"
             sx={{ backgroundColor: "#1e3a8a" }}
-            onClick={() => setOpenDialog(true)}
+            onClick={handleAddClick}
           >
             New Student
           </Button>
@@ -218,7 +225,7 @@ const StudentPage = () => {
         open={openDialog}
         onClose={handleCloseDialog}
         onSave={handleAddOrEditStudent}
-        initialData={student}
+        studentId={selectedStudentId}
       />
       <ConfirmationDialog
         open={deleteDialogOpen}

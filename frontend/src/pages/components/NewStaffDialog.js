@@ -1,46 +1,66 @@
-import React, { useEffect } from 'react';
-import * as yup from 'yup';
+import React, { useEffect } from "react";
+import * as yup from "yup";
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, Button, Grid, Typography, useTheme
-} from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Grid,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { GetStaffById } from "../../redux/slices/staff";
+import { useDispatch, useSelector } from "react-redux";
 
 const staffSchema = yup.object().shape({
-  name: yup.string().required('Name is required'),
+  name: yup.string().required("Name is required"),
   email: yup
     .string()
-    .required('Email is required')
-    .email('Enter a valid email address'),
+    .required("Email is required")
+    .email("Enter a valid email address"),
 });
 
-const NewStaffDialog = ({ open, onClose, onSave, defaultValues }) => {
+const NewStaffDialog = ({ open, onClose, onSave, staffId }) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  console.log(staffId, "sttt");
+  const { staff } = useSelector((state) => state.staffs);
 
-  console.log(defaultValues,"deff")
+  console.log(staff, "deff");
 
- const {
+  const {
     control,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     defaultValues: {
-      name: '',
-      email: '',
+      name: "",
+      email: "",
     },
     resolver: yupResolver(staffSchema),
   });
 
   useEffect(() => {
-    if (defaultValues) {
+    if (staffId) {
+      dispatch(GetStaffById(staffId));
+    } else {
+      reset({ name: "", email: "" });
+    }
+  }, [dispatch, staffId, reset]);
+
+  useEffect(() => {
+    if (staffId && staff) {
       reset({
-        name: defaultValues.name || '',
-        email: defaultValues.email || '',
+        name: staff.name || "",
+        email: staff.email || "",
       });
     }
-  }, [defaultValues, reset]);
+  }, [staffId, staff, reset]);
 
   const handleSave = (data) => {
     onSave(data);
@@ -60,12 +80,12 @@ const NewStaffDialog = ({ open, onClose, onSave, defaultValues }) => {
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 3, padding: theme.spacing(1) }
+        sx: { borderRadius: 3, padding: theme.spacing(1) },
       }}
     >
       <DialogTitle>
         <Typography variant="h6" fontWeight="bold" sx={{ color: "#1e3a8a" }}>
-          {defaultValues?._id ? "Edit Staff" : "Add New Staff"}
+          {staff?._id ? "Edit Staff" : "Add New Staff"}
         </Typography>
       </DialogTitle>
 
@@ -110,7 +130,12 @@ const NewStaffDialog = ({ open, onClose, onSave, defaultValues }) => {
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={handleClose} variant="outlined" color="secondary" sx={{ borderRadius: 2 }}>
+        <Button
+          onClick={handleClose}
+          variant="outlined"
+          color="secondary"
+          sx={{ borderRadius: 2 }}
+        >
           Cancel
         </Button>
         <Button
@@ -120,7 +145,7 @@ const NewStaffDialog = ({ open, onClose, onSave, defaultValues }) => {
             borderRadius: 2,
             backgroundColor: "#facc15",
             color: "#000",
-            '&:hover': { backgroundColor: "#eab308" }
+            "&:hover": { backgroundColor: "#eab308" },
           }}
         >
           Save

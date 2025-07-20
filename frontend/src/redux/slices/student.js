@@ -109,7 +109,8 @@ export function UpdateStudent(id, data) {
         `${process.env.REACT_APP_BASE_URL}/api/students/${id}`,
         data
       );
-      dispatch(slice.actions.updateStudentSuccess(response.data));
+      console.log(response,"uppdd")
+      dispatch(slice.actions.updateStudentSuccess(response.data.student));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
       throw error;

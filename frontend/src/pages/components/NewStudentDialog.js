@@ -1,59 +1,80 @@
-
-import React, { useEffect } from 'react';
-import * as yup from 'yup';
+import React, { useEffect } from "react";
+import * as yup from "yup";
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Typography, Grid, TextField, Button
-} from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useTheme } from '@mui/material/styles';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Grid,
+  TextField,
+  Button,
+} from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useTheme } from "@mui/material/styles";
+import { GetStudentById } from "../../redux/slices/student";
+import { useDispatch, useSelector } from "react-redux";
 
 const studentSchema = yup.object().shape({
-  name: yup.string().required('Name is required'),
+  name: yup.string().required("Name is required"),
   age: yup
     .number()
-    .typeError('Age must be a number')
-    .required('Age is required')
-    .min(1, 'Age must be at least 1'),
-  grade: yup.string().required('Grade is required'),
+    .typeError("Age must be a number")
+    .required("Age is required")
+    .min(1, "Age must be at least 1"),
+  grade: yup.string().required("Grade is required"),
   contact: yup
     .string()
-    .required('Contact is required')
-    .matches(/^\d{10}$/, 'Contact must be a 10-digit number'),
+    .required("Contact is required")
+    .matches(/^\d{10}$/, "Contact must be a 10-digit number"),
 });
 
-const NewStudentDialog = ({ open, onClose, onSave, initialData }) => {
+const NewStudentDialog = ({
+  open,
+  onClose,
+  onSave,
+  studentId,
+}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
 
-  console.log(initialData,"initialdata")
+  console.log(studentId, "studentId");
+  const { student } = useSelector((state) => state.students);
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     defaultValues: {
-      name: '',
-      age: '',
-      grade: '',
-      contact: ''
+      name: "",
+      age: "",
+      grade: "",
+      contact: "",
     },
     resolver: yupResolver(studentSchema),
   });
 
-useEffect(() => {
-  if (initialData) {
-    reset({
-      name: initialData.name || '',
-      age: initialData.age || '',
-      grade: initialData.grade || '',
-      contact: initialData.contact || '',
-    });
-  }
-}, [initialData, reset]);
+  useEffect(() => {
+    if (studentId) {
+      dispatch(GetStudentById(studentId));
+    } else {
+      reset({ name: "", age: "", grade: "", contact: "" });
+    }
+  }, [dispatch, studentId, reset]);
 
+  useEffect(() => {
+    if (student && studentId) {
+      reset({
+        name: student.name || "",
+        age: student.age || "",
+        grade: student.grade || "",
+        contact: student.contact || "",
+      });
+    }
+  }, [student, reset, studentId]);
 
   const handleSave = (data) => {
     onSave(data);
@@ -71,13 +92,12 @@ useEffect(() => {
     >
       <DialogTitle>
         <Typography variant="h6" fontWeight="bold" sx={{ color: "#1e3a8a" }}>
-          {initialData ? 'Edit Student' : 'Add New Student'}
+          {student ? "Edit Student" : "Add New Student"}
         </Typography>
       </DialogTitle>
 
       <DialogContent dividers>
         <Grid container spacing={2} mt={1} direction="column">
-
           {/* Name Field */}
           <Grid item>
             <Controller
@@ -150,12 +170,16 @@ useEffect(() => {
               )}
             />
           </Grid>
-
         </Grid>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={onClose} variant="outlined" color="secondary" sx={{ borderRadius: 2 }}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          color="secondary"
+          sx={{ borderRadius: 2 }}
+        >
           Cancel
         </Button>
         <Button
@@ -165,7 +189,7 @@ useEffect(() => {
             borderRadius: 2,
             backgroundColor: "#facc15",
             color: "#000",
-            '&:hover': { backgroundColor: "#eab308" }
+            "&:hover": { backgroundColor: "#eab308" },
           }}
         >
           Save

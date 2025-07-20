@@ -63,7 +63,7 @@ export function CreateStaff(data) {
         `${process.env.REACT_APP_BASE_URL}/api/staff`,
         data
       );
-      console.log("crpro", response.data);
+      console.log("crpro", response);
       dispatch(slice.actions.createStaffSuccess(response.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
@@ -109,7 +109,8 @@ export function updateStaff(id, data) {
         `${process.env.REACT_APP_BASE_URL}/api/staff/${id}`,
         data
       );
-      dispatch(slice.actions.updateStaffSuccess(response.data));
+      console.log(response.data,'upd')
+      dispatch(slice.actions.updateStaffSuccess(response.data.staff));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
       throw error;

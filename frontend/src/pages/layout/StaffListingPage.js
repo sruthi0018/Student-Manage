@@ -24,6 +24,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearSingleStaff,
   CreateStaff,
   DeleteStaff,
   GetAllStaffs,
@@ -44,7 +45,7 @@ const StaffPage = () => {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedStaffId, setSelectedStaffId] = useState(null);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState(null);
+  // const [selectedStaff, setSelectedStaff] = useState(null);
 
   const [alert, setAlert] = useState({
     open: false,
@@ -65,13 +66,15 @@ const StaffPage = () => {
   const { staffs, staff, isLoading } = useSelector((state) => state.staffs);
 
   const handleAddClick = () => {
+    dispatch(clearSingleStaff());
+    setSelectedStaffId(null);
     setEditingStaff(null);
     setOpenDialog(true);
   };
 
   const handlePermissionsClick = async (staffId) => {
     try {
-      await dispatch(GetStaffById(staffId));
+      // await dispatch(GetStaffById(staffId));
 
       setPermissionsDialogOpen(true);
     } catch (error) {
@@ -81,7 +84,8 @@ const StaffPage = () => {
 
   const handleEditClick = async (staffId) => {
     try {
-      await dispatch(GetStaffById(staffId));
+      // await dispatch(GetStaffById(staffId));
+      setSelectedStaffId(staffId);
       setOpenDialog(true);
     } catch (error) {
       console.error("Failed to load staff details:", error);
@@ -97,7 +101,7 @@ const StaffPage = () => {
     if (staffToDelete) {
       await dispatch(DeleteStaff(staffToDelete));
       showAlert("Staff deleted successfully", "success");
-      dispatch(GetAllStaffs());
+      // dispatch(GetAllStaffs());
       setDeleteDialogOpen(false);
       setStaffToDelete(null);
     }
@@ -105,8 +109,8 @@ const StaffPage = () => {
 
   const handleAddOrEditStaff = async (staffData) => {
     try {
-      if (staff) {
-        const id = staff?._id;
+      if (selectedStaffId) {
+        const id = selectedStaffId;
         await dispatch(updateStaff(id, staffData));
         showAlert("Staff updated successfully", "success");
       } else {
@@ -119,6 +123,7 @@ const StaffPage = () => {
       dispatch(GetAllStaffs());
 
       setEditingStaff(null);
+      setSelectedStaffId(null);
       setOpenDialog(false);
     } catch (error) {
       showAlert("Failed", "error");
@@ -132,7 +137,7 @@ const StaffPage = () => {
         await dispatch(
           updateStaffPermissions(staff._id, { permissions: updatedPermissions })
         );
-        dispatch(GetAllStaffs());
+        // dispatch(GetAllStaffs());
         showAlert("Staff Permissions updated successfully", "success");
         setPermissionsDialogOpen(false);
       } catch (error) {
@@ -141,6 +146,8 @@ const StaffPage = () => {
       }
     }
   };
+
+  console.log(selectedStaffId, "selectedStaffId");
 
   return (
     <Box component="main">
@@ -184,7 +191,7 @@ const StaffPage = () => {
                       e.stopPropagation();
                       setMenuAnchor(e.currentTarget);
                       setSelectedStaffId(item._id);
-                      setSelectedStaff(item);
+                     
                     }}
                   >
                     <MoreVertIcon />
@@ -245,9 +252,12 @@ const StaffPage = () => {
       </TableContainer>
       <NewStaffDialog
         open={openDialog}
-        onClose={() => setOpenDialog(false)}
+        onClose={() => {
+          dispatch(clearSingleStaff());
+          setOpenDialog(false);
+        }}
         onSave={handleAddOrEditStaff}
-        defaultValues={staff}
+        staffId={selectedStaffId}
       />
       <ConfirmationDialog
         open={deleteDialogOpen}
